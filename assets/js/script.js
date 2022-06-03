@@ -1,22 +1,26 @@
 //https://www.loc.gov/search/?q=baseball&fo=json no format
 //https://www.loc.gov/collections/civil-war-maps?fo=json with format
 
-/* <artcle class="card bg-dark text-light p-4">
-        <h3>Story Title</h3>
-        <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Suscipit repudiandae in mollitia quia 
-            quaerat nulla magnam, optio aut repellendus praesentium ab cupiditate, ipsum exercitationem aperiam 
-            voluptatem? Debitis magnam placeat incidunt.
-        </p>
-        <button class="btn btn-light text-dark">Read More</button>
-    </artcle> 
-*/
-
 var searchResultElement = document.querySelector("#search-results");
+var searchInput = document.querySelector("#q");
+var formatInput = document.querySelector("#format");
+var searchForm = document.querySelector("#loc-search-form");
 
-var getSearchResults = function() {
-    var fetchURL = "https://www.loc.gov/search/?q=baseball&fo=json";
+//Function that fetch the api and get the required content
+var getSearchResults = function(q, format) {
+    var searchURL;
 
-    fetch(fetchURL)
+    //If user set a format in dropdown it will read this url, else read the other url if only search happen
+    if (format) {
+
+        searchURL = `https://www.loc.gov/${format}/?q=${q}&fo=json`;
+
+    } else {
+
+        searchURL = `https://www.loc.gov/search/?q=${q}&fo=json`;
+    }
+
+    fetch(searchURL)
 
         //Return the api as a json 
         .then(function(response) {
@@ -29,6 +33,7 @@ var getSearchResults = function() {
             //Clear the html page
             searchResultElement.innerHTML = null;
 
+            //Loop through each results and for each result, create an article element and content inside
             for (var result of data.results) {
                 
                 //Create Element
@@ -60,5 +65,22 @@ var init = function() {
 
     getSearchResults();
 }
+
+//Function that handle submit form
+var handleSearch = function(event) {
+
+    //Prevent any default action
+    event.preventDefault();
+
+    //Get the value of the user input
+    var input = searchInput.value.trim();
+    var format = formatInput.value;
+
+    //Call the function to get search results
+    getSearchResults(input, format);
+}
+
+//Add event listener for the form
+searchForm.addEventListener("submit", handleSearch);
 
 init();
