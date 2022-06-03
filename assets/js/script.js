@@ -40,7 +40,7 @@ var getSearchResults = function(q, format) {
                 var articleElement = document.createElement("article");
                 var titleElement = document.createElement("h3");
                 var paragraphElement = document.createElement("p");
-                var buttonElement = document.createElement("button");
+                var buttonElement = document.createElement("a");
 
                 //Assign class name to element
                 articleElement.className = "card p-4 bg-dark text-light my-3";
@@ -50,6 +50,8 @@ var getSearchResults = function(q, format) {
                 titleElement.textContent = result.title;
                 paragraphElement.textContent = result.description[0];
                 buttonElement.textContent = "Learn More";
+                buttonElement.href = result.url;
+                buttonElement.target = "_blank";
 
                 //Append the title, paragraph, and button to article tag
                 articleElement.append(titleElement, paragraphElement, buttonElement);
@@ -63,7 +65,14 @@ var getSearchResults = function(q, format) {
 //Main function (Init)
 var init = function() {
 
-    getSearchResults();
+    //If something has value 
+    if (location.search) {
+
+        var url = new URL(location.href);
+        var q = url.searchParams.get("q");
+        var format = url.searchParams.get("format");
+        getSearchResults(q, format);
+    }
 }
 
 //Function that handle submit form
@@ -76,8 +85,19 @@ var handleSearch = function(event) {
     var input = searchInput.value.trim();
     var format = formatInput.value;
 
-    //Call the function to get search results
-    getSearchResults(input, format);
+    if (!input) return;
+
+    //If the search result existed
+    if (searchResultElement) {
+
+        //Call the function to get search results
+        getSearchResults(input, format);
+
+    } else {
+
+        //Redirect user to the search result html
+        location.replace("search-result.html?q=" + input + "&format=" + format);
+    }
 }
 
 //Add event listener for the form
